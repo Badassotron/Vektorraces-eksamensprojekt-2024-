@@ -44,9 +44,7 @@ while True:
 
 
 
-    matrix2D = [[0] * steps] * steps
-
-    print(matrix2D)
+    matrix2D = [["OOB"] * steps] * steps
 
 
 
