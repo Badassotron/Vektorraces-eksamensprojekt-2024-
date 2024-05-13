@@ -26,13 +26,8 @@ black = 40, 30, 20
 matrix2D = []
 
 
-
-# Main game loop
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
+# Window setup
+def gridWindow():
     # Fill the window with white color
     window.fill((220, 210, 200))
     # And grid lines
@@ -44,9 +39,19 @@ while True:
 
 
 
+# Main game loop
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+
+    gridWindow()
+
+
     matrix2D = [["OOB"] * steps] * steps
 
 
 
     # Update the display
     pygame.display.flip()
+
