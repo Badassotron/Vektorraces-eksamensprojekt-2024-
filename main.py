@@ -1,13 +1,13 @@
 import pygame
+import math
 
 # Initialize Pygame
 pygame.init()
 
 
 
-
 size = 600
-grids = 30
+grids = 40
 
 
 
@@ -23,9 +23,6 @@ black = 40, 30, 20
 
 
 
-matrix2D = []
-
-
 # Window setup
 def gridWindow():
     # Fill the window with white color
@@ -39,19 +36,15 @@ def gridWindow():
 
 
 
-# Main game loop
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
-    gridWindow()
-
-
-    matrix2D = [["OOB"] * steps] * steps
+def main():
+    while True:
 
 
 
-    # Update the display
-    pygame.display.flip()
+        # Update the display
+        pygame.display.flip()
 
+
+
+if __name__ == "__main__":
+    main()
