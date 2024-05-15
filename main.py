@@ -9,7 +9,7 @@ from vector import Vec
 pygame.init()
 
 
-
+k
 size: int = 600
 grids: int = 40
 
