@@ -26,9 +26,6 @@ grey = 200, 190, 180
 black = 40, 30, 20
 
 
-
-
-
 # Window setup
 def gridWindow():
     # Fill the window with white color
@@ -43,8 +40,10 @@ def gridWindow():
     for y in range(1, grids):
         pygame.draw.line(window, grey, ((size / grids) * y, 0), ((size / grids) * y, size), 2)
 
+
 def square_validity_checker():
-    while True
+    while True:
+        pass
 
 
 # Road setup
