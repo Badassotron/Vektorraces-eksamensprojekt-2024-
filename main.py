@@ -27,6 +27,9 @@ grey = 200, 190, 180
 black = 40, 30, 20
 
 
+
+
+
 # Window setup
 def gridWindow():
     # Fill the window with white color
