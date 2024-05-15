@@ -1,7 +1,8 @@
 import pygame
-# import math
+import math
 
 from grid import Grid
+from grid import Tile
 from vector import Vec
 
 # Initialize Pygame
@@ -46,7 +47,7 @@ def road():
     for x in range(0, grids):
         for y in range(0, grids):
             if matrix.get_tile_weight(Vec(x, y)) >= 0:
-                pygame.draw.rect(window, white, (x, y, (size / grids), (size / grids)))
+                pygame.draw.rect(window, white, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
 
 
 # Main loop
@@ -55,6 +56,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+        matrix.setTile(Vec(0, 0), Tile(True, 3))
 
         gridWindow()
 
