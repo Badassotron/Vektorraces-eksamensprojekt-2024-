@@ -23,7 +23,8 @@ class Grid:
 
 
     def setTile(self, position: Vec, tile: Tile):
-        self._tiles[position.x][position.y] = tile
+        if -1 < position.x < self._size.x and -1 < position.y < self._size.y:
+            self._tiles[position.x][position.y] = tile
 
 
     def get_tile_weight(self, position: Vec) -> int:

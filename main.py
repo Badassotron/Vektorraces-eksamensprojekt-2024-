@@ -1,12 +1,14 @@
 import pygame
-# import math
+import math
+import random
 
 from grid import Grid
+from grid import Tile
 from vector import Vec
+
 
 # Initialize Pygame
 pygame.init()
-
 
 
 size: int = 600
@@ -31,7 +33,7 @@ def gridWindow():
     # Fill the window with white color
     window.fill(black)
 
-    road()
+    draw()
 
     # And grid lines
     for x in range(1, grids):
@@ -47,15 +49,27 @@ def square_validity_checker():
 
 
 # Road setup
-def road():
+def draw():
     for x in range(0, grids):
         for y in range(0, grids):
             if matrix.get_tile_weight(Vec(x, y)) >= 0:
-                pygame.draw.rect(window, white, (x, y, (size / grids), (size / grids)))
+                pygame.draw.rect(window, white, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
+
+
+def road():
+    roadMid = Vec(int(grids / 2), int(grids / 2))
+    roadR = int((roadMid.x + (roadMid.x - 10)) / 2)
+
+    for angle in range(0, 180):
+        roadVec = Vec(int(roadMid.x + roadR * math.cos(math.radians(angle * 2))), int(roadMid.y + roadR * math.sin(math.radians(angle * 2))))
+        for x in range(roadVec.x - random.randint(1, 3), roadVec.x + random.randint(1, 3)):
+            for y in range(roadVec.y - random.randint(1, 3), roadVec.y + random.randint(1, 3)):
+                matrix.setTile(Vec(x, y), Tile(True, 0))
 
 
 # Main loop
 def main():
+    road()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
