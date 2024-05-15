@@ -37,6 +37,15 @@ class Grid:
         return self._tiles[position.x][position.y].weight
 
 
+    def get_active_tiles(self):
+        population: int = 0
+        for x in range(self._size.x):
+            for y in range(self._size.y):
+                if self._tiles[x][y].active == True:
+                    population += 1
+
+        return population
+
 
 ''' 
 -- Mega sej test grid --
