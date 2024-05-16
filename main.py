@@ -64,7 +64,7 @@ def draw():
     for x in range(0, grids):
         for y in range(0, grids):
             if matrix.get_tile_weight(Vec(x, y)) >= 0:
-                col = clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 10), 0, 255), clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 10), 0, 255), clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 10), 0, 255)
+                col = 255, clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 14), 160, 255), clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 7), 80, 255)
                 pygame.draw.rect(window, col, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
             if matrix.get_tile_weight(Vec(x, y)) == -10:
                 pygame.draw.rect(window, red, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
