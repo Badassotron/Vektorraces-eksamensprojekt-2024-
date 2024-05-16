@@ -37,7 +37,7 @@ class Grid:
         return self._tiles[position.x][position.y].weight
 
 
-    def get_active_tiles(self):
+    def get_active_tiles(self) -> int:
         population: int = 0
         for x in range(self._size.x):
             for y in range(self._size.y):
