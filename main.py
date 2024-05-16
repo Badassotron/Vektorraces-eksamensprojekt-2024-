@@ -11,9 +11,10 @@ from vector import Vec
 pygame.init()
 
 
-size: int = 600  # Should scale with grids and be an equal number
-grids: int = 40  # Minimum 20 and should be an equal number
-
+size: int = 600  # Should scale with grids and be an equal number.
+grids: int = 40  # Minimum 20 and should be an equal number.
+widthR: int = 3  # Road width multiplier. Minimum 2. Should scale with grids.
+roadComp: int = 5  # Complexity of the road. Lower numbers mean more complex roads. Should scale with road width.
 
 
 # Make grid with classes
@@ -63,17 +64,17 @@ def draw():
     for x in range(0, grids):
         for y in range(0, grids):
             if matrix.get_tile_weight(Vec(x, y)) >= 0:
-                col = clamp(255 - matrix.get_tile_weight(Vec(x, y)), 0, 255), clamp(255 - matrix.get_tile_weight(Vec(x, y)), 0, 255), clamp(255 - matrix.get_tile_weight(Vec(x, y)), 0, 255)
+                col = clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 10), 0, 255), clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 10), 0, 255), clamp(int(255 - matrix.get_tile_weight(Vec(x, y)) / 10), 0, 255)
                 pygame.draw.rect(window, col, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
             if matrix.get_tile_weight(Vec(x, y)) == -10:
                 pygame.draw.rect(window, red, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
 
 
 def road():
-    for angle in range(0, 180):
-        roadVec = Vec(int(roadMid.x + roadR * math.cos(math.radians(angle * 2))), int(roadMid.y + roadR * math.sin(math.radians(angle * 2))))
-        for x in range(roadVec.x - random.randint(1, 3), roadVec.x + random.randint(1, 3)):
-            for y in range(roadVec.y - random.randint(1, 3), roadVec.y + random.randint(1, 3)):
+    for angle in range(0, int(360 / roadComp)):
+        roadVec = Vec(int(roadMid.x + roadR * math.cos(math.radians(angle * roadComp))), int(roadMid.y + roadR * math.sin(math.radians(angle * roadComp))))
+        for x in range(roadVec.x - random.randint(1, widthR), roadVec.x + random.randint(1, widthR)):
+            for y in range(roadVec.y - random.randint(1, widthR), roadVec.y + random.randint(1, widthR)):
                 matrix.setTile(Vec(x, y), Tile(True, 0))
 
 
@@ -87,14 +88,12 @@ def flood():
             matrix.setTile(Vec(roadMid.x, steps), Tile(True, -10))
 
             count += 1
-            if count == 3:
-                # startPos == Vec(roadMid.x - 1, steps)
-                matrix.setTile(Vec(roadMid.x + 1, steps), Tile(True, 1))
-
-    print("Active flood")
+            if count == widthR - 1:
+                startPos == Vec(roadMid.x - 1, steps)
+                matrix.setTile(Vec(roadMid.x + 1, steps), Tile(True, 10))
 
     while active > 1:
-        weight += 1
+        weight += 10
         active -= 1
 
         for x in range(grids):
@@ -102,13 +101,13 @@ def flood():
                 if matrix.get_tile_weight(Vec(x, y)) == weight:
                     for val in range(4):
                         if matrix.get_tile_weight(Vec(x, y + 1)) == 0:
-                            matrix.setTile(Vec(x, y + 1), Tile(True, weight + 1))
+                            matrix.setTile(Vec(x, y + 1), Tile(True, weight + 10))
                         if matrix.get_tile_weight(Vec(x, y - 1)) == 0:
-                            matrix.setTile(Vec(x, y - 1), Tile(True, weight + 1))
+                            matrix.setTile(Vec(x, y - 1), Tile(True, weight + 10))
                         if matrix.get_tile_weight(Vec(x + 1, y)) == 0:
-                            matrix.setTile(Vec(x + 1, y), Tile(True, weight + 1))
+                            matrix.setTile(Vec(x + 1, y), Tile(True, weight + 10))
                         if matrix.get_tile_weight(Vec(x - 1, y)) == 0:
-                            matrix.setTile(Vec(x - 1, y), Tile(True, weight + 1))
+                            matrix.setTile(Vec(x - 1, y), Tile(True, weight + 10))
 
     while inactive > 1:
         inactive -= 1
@@ -118,13 +117,13 @@ def flood():
                 if matrix.get_tile_weight(Vec(x, y)) == -2:
                     for val in range(4):
                         if matrix.get_tile_weight(Vec(x, y + 1)) == 0:
-                            matrix.setTile(Vec(x, y + 1), Tile(True, matrix.get_tile_weight(Vec(x, y + 1) + 1)))
+                            matrix.setTile(Vec(x, y + 1), Tile(True, matrix.get_tile_weight(Vec(x, y + 1)) + 5))
                         if matrix.get_tile_weight(Vec(x, y - 1)) == 0:
-                            matrix.setTile(Vec(x, y - 1), Tile(True, matrix.get_tile_weight(Vec(x, y - 1) + 1)))
+                            matrix.setTile(Vec(x, y - 1), Tile(True, matrix.get_tile_weight(Vec(x, y - 1)) + 5))
                         if matrix.get_tile_weight(Vec(x + 1, y)) == 0:
-                            matrix.setTile(Vec(x + 1, y), Tile(True, matrix.get_tile_weight(Vec(x + 1, y) + 1)))
+                            matrix.setTile(Vec(x + 1, y), Tile(True, matrix.get_tile_weight(Vec(x + 1, y)) + 5))
                         if matrix.get_tile_weight(Vec(x - 1, y)) == 0:
-                            matrix.setTile(Vec(x - 1, y), Tile(True, matrix.get_tile_weight(Vec(x - 1, y) + 1)))
+                            matrix.setTile(Vec(x - 1, y), Tile(True, matrix.get_tile_weight(Vec(x - 1, y)) + 5))
 
 
 # Main loop
