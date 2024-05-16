@@ -54,11 +54,11 @@ def gridWindow():
         pygame.draw.line(window, grey, ((size / grids) * y, 0), ((size / grids) * y, size), 2)
 
 
-def vecm():
-    mVec = Vec(startPos.x - 1, startPos.y)
-    for x in range(mVec.x - 2, mVec.x + 1):
-        for y in range(mVec.y - 2, mVec.y + 1):
-            matrix.get_tile_weight(Vec(x, y) + mVec)
+def vecMovement():
+    mainVec = Vec(startPos.x - 1, startPos.y)
+    for x in range(mainVec.x - 2, mainVec.x + 1):
+        for y in range(mainVec.y - 2, mainVec.y + 1):
+            matrix.get_tile_weight(Vec(x, y) + mainVec)
 
 
 
