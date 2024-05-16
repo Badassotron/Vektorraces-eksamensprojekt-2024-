@@ -41,7 +41,7 @@ class Grid:
         population: int = 0
         for x in range(self._size.x):
             for y in range(self._size.y):
-                if self._tiles[x][y].active == True:
+                if self._tiles[x][y].active:
                     population += 1
 
         return population

@@ -12,7 +12,7 @@ pygame.init()
 
 
 size: int = 600  # Should scale with grids and be an equal number
-grids: int = 30  # Minimum 20 and should be an equal number
+grids: int = 40  # Minimum 20 and should be an equal number
 
 
 
@@ -24,7 +24,7 @@ window = pygame.display.set_mode((size, size))
 pygame.display.set_caption("Pygame Window")
 
 white = 220, 210, 200
-grey = 200, 190, 180
+grey = 130, 120, 110
 red = 240, 80, 60
 black = 40, 30, 20
 
@@ -32,6 +32,10 @@ black = 40, 30, 20
 roadMid = Vec(int(grids / 2), int(grids / 2))
 roadR = int((roadMid.x + (roadMid.x - 10)) / 2)
 startPos = Vec(0, 0)
+
+
+def clamp(value, lower, upper):
+    return lower if value < lower else upper if value > upper else value
 
 
 # Window setup
@@ -59,7 +63,7 @@ def draw():
     for x in range(0, grids):
         for y in range(0, grids):
             if matrix.get_tile_weight(Vec(x, y)) >= 0:
-                col = 255 - matrix.get_tile_weight(Vec(x, y)) * 2, 255 - matrix.get_tile_weight(Vec(x, y)) * 2, 255 - matrix.get_tile_weight(Vec(x, y)) * 2
+                col = clamp(255 - matrix.get_tile_weight(Vec(x, y)), 0, 255), clamp(255 - matrix.get_tile_weight(Vec(x, y)), 0, 255), clamp(255 - matrix.get_tile_weight(Vec(x, y)), 0, 255)
                 pygame.draw.rect(window, col, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
             if matrix.get_tile_weight(Vec(x, y)) == -10:
                 pygame.draw.rect(window, red, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
@@ -76,6 +80,7 @@ def road():
 def flood():
     count = 0
     active = matrix.get_active_tiles()
+    inactive = grids * grids - active
     weight = 0
     for steps in range(0, roadMid.y):
         if matrix.get_tile_weight(Vec(roadMid.x, steps)) >= 0:
@@ -104,6 +109,22 @@ def flood():
                             matrix.setTile(Vec(x + 1, y), Tile(True, weight + 1))
                         if matrix.get_tile_weight(Vec(x - 1, y)) == 0:
                             matrix.setTile(Vec(x - 1, y), Tile(True, weight + 1))
+
+    while inactive > 1:
+        inactive -= 1
+
+        for x in range(grids):
+            for y in range(grids):
+                if matrix.get_tile_weight(Vec(x, y)) == -2:
+                    for val in range(4):
+                        if matrix.get_tile_weight(Vec(x, y + 1)) == 0:
+                            matrix.setTile(Vec(x, y + 1), Tile(True, matrix.get_tile_weight(Vec(x, y + 1) + 1)))
+                        if matrix.get_tile_weight(Vec(x, y - 1)) == 0:
+                            matrix.setTile(Vec(x, y - 1), Tile(True, matrix.get_tile_weight(Vec(x, y - 1) + 1)))
+                        if matrix.get_tile_weight(Vec(x + 1, y)) == 0:
+                            matrix.setTile(Vec(x + 1, y), Tile(True, matrix.get_tile_weight(Vec(x + 1, y) + 1)))
+                        if matrix.get_tile_weight(Vec(x - 1, y)) == 0:
+                            matrix.setTile(Vec(x - 1, y), Tile(True, matrix.get_tile_weight(Vec(x - 1, y) + 1)))
 
 
 # Main loop
