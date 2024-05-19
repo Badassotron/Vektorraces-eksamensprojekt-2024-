@@ -6,6 +6,7 @@ import time
 from grid import Grid
 from grid import Tile
 from vector import Vec
+from vector import VecLine
 
 
 # Initialize Pygame
@@ -15,7 +16,7 @@ pygame.init()
 # Main parameters for road generation and algorithm
 
 size: int = 600  # Should scale with grids and be an equal number.
-grids: int = 40  # Minimum 20 and should be an equal number.
+grids: int = 30  # Minimum 20 and should be an equal number.
 widthR: int = 3  # Road width multiplier. Minimum 2. Should scale with grids.
 roadComp: int = 5  # Complexity of the road. Lower numbers mean more complex roads. Should scale with road width.
 
@@ -42,7 +43,7 @@ roadR = int((roadMid.x + (roadMid.x - 10)) / 2)
 startPos = Vec(0, 0)
 
 vectorSave = []
-minVal: int = 0
+count: int = 0
 
 finish: bool = False
 
@@ -66,12 +67,6 @@ def draw():
             if matrix.get_tile_weight(Vec(x, y)) == -10:
                 pygame.draw.rect(window, red, (x * (size / grids), y * (size / grids), (size / grids), (size / grids)))
 
-    # Color vectors
-    for x in range(len(vectorSave)):
-        vecx: Vec = vectorSave[x][0]
-        vecy: Vec = vectorSave[x][1]
-        pygame.draw.line(window, green, (vecx.x, vecx.y), (vecy.x, vecy.y), 2)
-
 
 def gridWindow():
     window.fill(black)
@@ -83,6 +78,13 @@ def gridWindow():
 
     for y in range(1, grids):
         pygame.draw.line(window, grey, ((size / grids) * y, 0), ((size / grids) * y, size), 2)
+
+    # Color vectors
+    for i in range(len(vectorSave)):
+        pygame.draw.line(window, green, (vectorSave[i].start.x * int(size / grids) + int((size / grids) / 2), vectorSave[i].start.y * int(size / grids) + int((size / grids) / 2)), (vectorSave[i].end.x * int(size / grids) + int((size / grids) / 2), vectorSave[i].end.y * int(size / grids) + int((size / grids) / 2)), 4)
+
+    # Update the display
+    pygame.display.flip()
 
 
 # Road generation and flooding
@@ -100,6 +102,8 @@ def flood():
     active: int = matrix.get_active_tiles()
     inactive: int = grids * grids - active
     weight: int = 0
+    startVecTemp: Vec = Vec(0, 0)
+    maxVal: int = 0
 
     # Generate finish line and first flood point
     for steps in range(0, roadMid.y):
@@ -108,8 +112,7 @@ def flood():
 
             count += 1
             if count == widthR - 1:
-                startPos = Vec(roadMid.x - 1, steps)
-                print(startPos)
+                startVecTemp = Vec(roadMid.x - 1, steps)
                 matrix.setTile(Vec(roadMid.x + 1, steps), Tile(True, 10))
 
     # Main flooding of active tiles
@@ -132,6 +135,8 @@ def flood():
                         if matrix.get_tile_weight(Vec(x - 1, y)) == 0:
                             matrix.setTile(Vec(x - 1, y), Tile(True, weight + 10))
 
+                    maxVal = weight + 50
+
     # Overflooding of all tiles near a wall
     while inactive > 1:
         inactive -= 1
@@ -150,12 +155,18 @@ def flood():
                         if matrix.get_tile_weight(Vec(x - 1, y)) == 0:
                             matrix.setTile(Vec(x - 1, y), Tile(True, matrix.get_tile_weight(Vec(x - 1, y)) + 5))
 
+    return startVecTemp, maxVal
+
 
 # Movement of vector algorithm
-def vecMovement():
-    moveVec: Vec = Vec(-1, 0)
-    currentPos: Vec = startPos
+def vecMovement(t, save, m):
+    moveVec: Vec = Vec(save[t].start.x - save[t].end.x, save[t].start.y - save[t].end.y)
+    moveVecPlus: Vec = Vec(int(abs(moveVec.x)), int(abs(moveVec.y)))
+    currentPos: Vec = save[t].end
+
     vectorCheck: Vec = Vec(0, 0)
+    tempVec: Vec = Vec(0, 0)
+    minVal: int = m
 
     vecx: int = 0
     vecy: int = 0
@@ -163,36 +174,34 @@ def vecMovement():
     vecDone: bool = True
 
     while vecDone:
-        for x in range(currentPos.x + moveVec.x - 2, currentPos.x + moveVec.x + 1):
-            for y in range(currentPos.y + moveVec.y - 2, currentPos.y + moveVec.y + 1):
-                if 0 < matrix.get_tile_weight(Vec(x, y)) < minVal:
-                    vectorCheck = Vec(currentPos.x + moveVec.x + x, currentPos.y + moveVec.y + y)
-                    minVal = matrix.get_tile_weight(Vec(x, y))
+        for x in range(currentPos.x + moveVec.x - 1, currentPos.x + moveVec.x + 2):
+            for y in range(currentPos.y + moveVec.y - 1, currentPos.y + moveVec.y + 2):
+                vectorCheck = Vec(x, y)
+                if 0 < matrix.get_tile_weight(vectorCheck) < minVal:
+                    tempVec = vectorCheck
+                    minVal = matrix.get_tile_weight(vectorCheck)
 
         print(minVal)
 
-        for i in range(0, vectorCheck.x - 1):
-            vecx += vectorCheck.x - i
-        for j in range(0, vectorCheck.y - 1):
-            vecy += vectorCheck.y - j
+        for i in range(0, moveVecPlus.x - 1):
+            vecx += moveVecPlus.x - i
+        for j in range(0, moveVecPlus.y - 1):
+            vecy += moveVecPlus.y - j
 
-        if not matrix.get_tile_weight(Vec(vecx, vecy) + currentPos + vectorCheck) == -1 or -2:
-            moveVec = vectorCheck
+        if matrix.get_tile_weight(Vec(vecx, vecy) + tempVec) > 0:
             vecDone = False
-            vectorSave.append([Vec(currentPos.x, currentPos.y), Vec(moveVec.x, moveVec.y)])
-            print(vecx)
-            print(vecy)
-            print(currentPos)
-            print(vectorCheck)
-            print(Vec(vecx, vecy) + currentPos + vectorCheck)
+            save.append(VecLine(currentPos, tempVec))
         else:
-            matrix.setTile(vectorCheck, Tile(True, matrix.get_tile_weight(vectorCheck) + 50))
-            print("Other")
+            if not matrix.get_tile_weight(tempVec) < 0:
+                matrix.setTile(tempVec, Tile(True, matrix.get_tile_weight(tempVec) + 50))
+                print("Other")
 
 
 # Main loop
-def main():
+def main(t):
     first = True
+    startPosTemp: Vec = Vec(0, 0)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -200,21 +209,22 @@ def main():
 
         if first:
             road()
-            flood()
+            startPosTemp, maxVal = flood()
+            vectorSave.append(VecLine(Vec(startPosTemp.x - 1, startPosTemp.y), startPosTemp))
+            print(startPosTemp)
 
             first = False
 
-        if finish == False:
-            vecMovement()
+
+        if not finish:
+            vecMovement(t, vectorSave, maxVal)
+            t += 1
 
         gridWindow()
 
-        # Update the display
-        pygame.display.flip()
-
-        time.sleep(1)
+        time.sleep(0.5)
 
 
 
 if __name__ == "__main__":
-    main()
+    main(count)

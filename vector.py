@@ -11,3 +11,9 @@ class Vec:
 
     def __str__(self) -> str:
         return f'{{ x: {self.x}, y: {self.y} }}'
+
+
+class VecLine:
+    def __init__(self, start: Vec, end: Vec):
+        self.start: Vec = start
+        self.end: Vec = end
