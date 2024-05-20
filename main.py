@@ -16,9 +16,11 @@ pygame.init()
 # Main parameters for road generation and algorithm
 
 size: int = 600  # Should scale with grids and be an equal number.
-grids: int = 40  # Minimum 20 and should be an equal number.
+grids: int = 30  # Minimum 20 and should be an even number.
 widthR: int = 3  # Road width multiplier. Minimum 2. Should scale with grids.
 roadComp: int = 1  # Complexity of the road. Lower numbers mean more complex roads. Should scale with road width.
+
+delay: float = 0.2  # Time between updates
 
 
 
@@ -42,7 +44,7 @@ roadMid = Vec(int(grids / 2), int(grids / 2))
 roadR = int((roadMid.x + (roadMid.x - 10)) / 2)
 startPos = Vec(0, 0)
 
-vectorSave = []
+vectorSave: list[VecLine] = []
 count: int = 0
 
 finish: bool = False
@@ -158,7 +160,7 @@ def flood():
 
 # Movement of vector algorithm
 def vecMovement(t, save):
-    moveVec: Vec = Vec(save[t].end.x - save[t].start.x, save[t].end.y - save[t].start.y)
+    moveVec: Vec = save[t].end - save[t].start
     currentPos: Vec = save[t].end
 
     tempVec: Vec = Vec(0, 0)
@@ -194,7 +196,7 @@ def vecMovement(t, save):
 
             pygame.draw.line(window, red, (currentPos.x * int(size / grids) + int((size / grids) / 2), currentPos.y * int(size / grids) + int((size / grids) / 2)), (tempVec.x * int(size / grids) + int((size / grids) / 2), tempVec.y * int(size / grids) + int((size / grids) / 2)), 4)
 
-            time.sleep(0.5)
+            time.sleep(delay)
 
             moveVec: Vec = Vec(save[t].end.x - save[t].start.x, save[t].end.y - save[t].start.y)
             currentPos: Vec = save[t].end
@@ -213,8 +215,9 @@ def vecMovement(t, save):
 
 
 # Main loop
-def main(t):
-    first = True
+def main():
+    first: bool = True
+    t = 0
 
     while True:
         for event in pygame.event.get():
@@ -236,9 +239,9 @@ def main(t):
 
         gridWindow()
 
-        time.sleep(0.5)
+        time.sleep(delay)
 
 
 
 if __name__ == "__main__":
-    main(count)
+    main()
